@@ -1,0 +1,24 @@
+PATH
+  remote: .
+  specs:
+    rate-limit (0.1.0)
+      redis (~> 3.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    minitest (5.5.1)
+    rake (10.4.2)
+    redis (3.2.0)
+    spy (0.4.1)
+    timecop (0.7.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  minitest (~> 5.5.1)
+  rake (~> 10.0)
+  rate-limit!
+  spy (~> 0.4.1)
+  timecop (~> 0.7.1)
