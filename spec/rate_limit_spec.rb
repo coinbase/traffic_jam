@@ -101,4 +101,18 @@ describe RateLimit do
       assert_equal 0, rate_limit.used(value)
     end
   end
+
+  describe :decrement do
+    it "should reduce the amount used" do
+      rate_limit.increment(value, 3)
+      rate_limit.decrement(value, 2)
+      assert_equal 1, rate_limit.used(value)
+    end
+
+    it "should not lower amount used below 0" do
+      rate_limit.decrement(value, 2)
+      assert !rate_limit.increment(value, 4)
+      assert_equal 0, rate_limit.used(value)
+    end
+  end
 end

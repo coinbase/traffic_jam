@@ -53,6 +53,11 @@ class RateLimit
     end
   end
 
+  def decrement(value, amount = 1)
+    return true if max.zero?
+    increment(value, -amount)
+  end
+
   def reset(value)
     redis.del(key(value))
   end
