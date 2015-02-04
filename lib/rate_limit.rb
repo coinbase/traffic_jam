@@ -22,7 +22,7 @@ class RateLimit
     redis.keys("#{key_prefix}:*").each { |key| redis.del(key) }
   end
 
-  def exceeded?(value, amount = 0)
+  def exceeded?(value, amount = 1)
     used(value) + amount > max
   end
 
