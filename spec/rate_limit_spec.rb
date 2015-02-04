@@ -1,5 +1,5 @@
+require 'rate_limit'
 require_relative 'spec_helper'
-require_relative '../lib/rate_limit'
 
 
 describe RateLimit do
