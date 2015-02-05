@@ -1,5 +1,7 @@
 class RateLimit
   module Errors
+    class LimitNotFound < StandardError; end
+
     class ExceededError < StandardError
       attr_accessor :rate_limit
 

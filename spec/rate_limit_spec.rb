@@ -115,4 +115,34 @@ describe RateLimit do
       assert_equal 0, rate_limit.used(value)
     end
   end
+
+  describe '::find' do
+    before { RateLimit.register(:test, 3, 60) }
+
+    it "should return registered rate limit" do
+      rate_limit = RateLimit.find(:test)
+      assert_equal :test, rate_limit.name
+      assert_equal 3, rate_limit.max
+      assert_equal 60, rate_limit.period
+    end
+
+    it "should return nil if not found" do
+      assert_nil RateLimit.find(:test2)
+    end
+  end
+
+  describe 'class helpers' do
+    before { RateLimit.register(:test, 3, 60) }
+
+    it "should call methods with registered limits" do
+      RateLimit.increment(:test, value, 1)
+      assert_equal 1, RateLimit.used(:test, value)
+    end
+
+    it "should raise error if limit not found" do
+      assert_raises(RateLimit::LimitNotFound) do
+        RateLimit.increment(:test2, value, 1)
+      end
+    end
+  end
 end

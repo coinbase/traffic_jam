@@ -70,8 +70,8 @@ class RateLimit
     amount = obj['amount']
     if timestamp && amount
       time_passed = Time.now.to_f - timestamp.to_i / 1000.0
-      drift = (max * time_passed / period).to_i
-      [amount.to_i - drift, 0].max
+      drift = max * time_passed / period
+      [(amount.to_f - drift).ceil, 0].max
     else
       0
     end
@@ -92,7 +92,28 @@ class RateLimit
     "#{@@config.key_prefix}:#{name}:#{hash}"
   end
 
-  def self.config
-    @@config
+  class << self
+    def config
+      @@config
+    end
+
+    def register(name, max, period)
+      @limits ||= {}
+      @limits[name.to_sym] = new(name, max, period)
+    end
+
+    def find(name)
+      @limits ||= {}
+      @limits[name.to_sym]
+    end
+
+    %w( exceeded? increment increment! decrement reset used remaining )
+      .each do |method|
+      define_method(method) do |limit, *args|
+        rate_limit = find(limit)
+        raise RateLimit::LimitNotFound.new(limit) if rate_limit.nil?
+        rate_limit.send(method, *args)
+      end
+    end
   end
 end
