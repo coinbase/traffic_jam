@@ -10,55 +10,92 @@ Instead of guaranteeing that the number of actions will never exceed the cap the
 require 'rate-limit'
 
 limit = RateLimit.new(:requests_per_user, 3, 1)
-limit.increment("user1")      # => True
-limit.increment("user1", 2)   # => True
-limit.increment("user1")      # => False
+limit.increment("user1")      # => true
+limit.increment("user1", 2)   # => true
+limit.increment("user1")      # => false
 
 sleep 1
 
-limit.increment("user1", 2)   # => True
-limit.exceeded?("user1", 1)   # => False
-limit.exceeded?("user1", 2)   # => True
+limit.increment("user1", 2)   # => true
+limit.exceeded?("user1", 1)   # => false
+limit.exceeded?("user1", 2)   # => true
 
 limit.used("user1")  # => 2
 limit.used("user1")  # => 1
 ```
 
+*For all methods, `value` must be a string or convertible to a distinct string when `to_s` is called.*
+
 ### Constructor
 
 `RateLimit.new(*action name*, *cap*, *period in seconds*)`
 
-### `increment(value, amount = 1)`
+### increment(value, amount = 1)
 
 Increment the amount used by the given number. Returns true if increment succeded and false if incrementing would exceed the limit.
 
-### `decrement(value, amount = 1)`
+### decrement(value, amount = 1)
 
 Decrement the amount used by the given number. Will never decrement below 0. Always returns true.
 
-### `increment!(value, amount = 1)`
+### increment!(value, amount = 1)
 
 Increment the amount used by the given number. Raises `RateLimit::ExceededError` if incrementing would exceed the limit.
 
-### `exceeded?(value, amount = 1)`
+### exceeded?(value, amount = 1)
 
 Return whether incrementing by the given amount would exceed limit. Does not change amount used.
 
-### `reset(value)`
+### reset(value)
 
 Sets amount used to 0.
 
-### `used(value)`
+### used(value)
 
 Return current amount used.
 
-### `remaining(value)`
+### remaining(value)
 
 Return current amount remaining.
 
-### `reset_all`
+### reset_all
 
 Reset all limits. *Warning: Not to be used in production.*
+
+## Registering limits
+
+Fixed limits can be registered for a key if the cap does not change depending on the value. All instance methods are available on the class.
+
+```
+RateLimit.register(:requests_per_user, 3, 1)
+
+limit = RateLimit.find(:requests_per_user)
+limit.increment("user1", 2)  # => true
+
+RateLimit.increment(:requests_per_user, "user1", 1)  # => true
+RateLimit.used(:requests_per_user, "user1")          # => 3
+```
+
+## Changing limit cap for a value
+
+Given an instance of `RateLimit` with a maximum cap and a period, the behavior is to increase the amount remaining at a rate of *max / period* since the last time `increment` was called for the given value. If the cap is defined on a per-value basis, it is good practice to call `increment(value, 0)` if the limit changes.
+
+For example:
+
+```
+user.requests_per_hour = 10
+
+limit = RateLimit.new(:requests_per_user, user.requests_per_hour, 60 * 60)
+limit.increment(user.id, 8)  # => true
+
+sleep 60
+
+limit.increment(value, 0)
+
+user.requests_per_hour = 20
+limit = RateLimit.new(:requests_per_user, user.requests_per_hour, 60 * 60)
+limit.increment(user.id, 8)  # => true
+```
 
 ## Running tests
 
