@@ -18,10 +18,6 @@ class RateLimit
     @name, @max, @period = name, max, period
   end
 
-  def reset_all
-    redis.keys("#{key_prefix}:*").each { |key| redis.del(key) }
-  end
-
   def exceeded?(value, amount = 1)
     used(value) + amount > max
   end
@@ -87,6 +83,12 @@ class RateLimit
   end
 
   def key(value)
+    value =
+      begin
+        value.to_rate_limit_value
+      rescue NoMethodError
+        value
+      end
     hash = Digest::MD5.base64digest(value.to_s)
     hash = hash[0...@@config.hash_length] if @@config.hash_length
     "#{@@config.key_prefix}:#{name}:#{hash}"
@@ -105,6 +107,10 @@ class RateLimit
     def find(name)
       @limits ||= {}
       @limits[name.to_sym]
+    end
+
+    def reset_all
+      @@config.redis.keys("#{key_prefix}:*").each { |key| redis.del(key) }
     end
 
     %w( exceeded? increment increment! decrement reset used remaining )
