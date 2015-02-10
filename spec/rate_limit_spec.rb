@@ -1,4 +1,4 @@
-require 'rate_limit'
+require 'rate-limit'
 require_relative 'spec_helper'
 
 

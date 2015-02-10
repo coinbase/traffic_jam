@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require_relative '../lib/rate_limit'
+require 'rate-limit'
 require 'json'
 require 'redis'
 require 'optparse'

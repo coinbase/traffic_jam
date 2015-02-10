@@ -1,7 +1,7 @@
 require 'ostruct'
 require 'digest/md5'
-require_relative 'rate_limit/errors'
-require_relative 'rate_limit/scripts'
+require_relative 'rate-limit/errors'
+require_relative 'rate-limit/scripts'
 
 
 class RateLimit
