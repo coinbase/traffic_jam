@@ -1,7 +1,7 @@
 require_relative 'scripts'
 
 
-class RateLimit
+module RateLimit
   class Target
     attr_reader :action, :max, :period, :value
 

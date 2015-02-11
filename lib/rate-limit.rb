@@ -5,7 +5,7 @@ require_relative 'rate-limit/configuration'
 require_relative 'rate-limit/target'
 
 
-class RateLimit
+module RateLimit
   include Errors
 
   @config = Configuration.new(

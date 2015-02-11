@@ -32,11 +32,10 @@ class Runner
   end
 
   def run
-    rate_limit = RateLimit.new(:test, options[:limit], 1)
     results = Hash[ (0...options[:keys]).map { |i| [ i, [ 0, 0 ] ] } ]
     options[:actions].times do
       i = results.keys.sample
-      if rate_limit.increment("val#{i}")
+      if RateLimit.increment(:test, "val#{i}")
         results[i][0] += 1
       else
         results[i][1] += 1
@@ -51,7 +50,12 @@ class Runner
       GC.copy_on_write_friendly = true if ( GC.copy_on_write_friendly? rescue false )
       rd.close
 
-      RateLimit.config.redis = Redis.connect(url: options[:redis_uri])
+      puts options[:limit]
+      RateLimit.configure do |config|
+        config.redis = Redis.connect(url: options[:redis_uri])
+        config.register :test, options[:limit], 1
+      end
+
       results = run
 
       wr.write(JSON.generate(results))

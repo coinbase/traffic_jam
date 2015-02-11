@@ -1,4 +1,4 @@
-class RateLimit
+module RateLimit
   module Errors
     class LimitNotFound < StandardError; end
 

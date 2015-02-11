@@ -1,4 +1,4 @@
-class RateLimit
+module RateLimit
   class Configuration
     OPTIONS = %i( key_prefix hash_length redis )
     attr_accessor *OPTIONS
