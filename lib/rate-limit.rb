@@ -3,6 +3,7 @@ require 'digest/md5'
 require_relative 'rate-limit/errors'
 require_relative 'rate-limit/configuration'
 require_relative 'rate-limit/target'
+require_relative 'rate-limit/target-group'
 
 
 module RateLimit

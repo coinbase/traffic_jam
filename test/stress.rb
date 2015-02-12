@@ -50,7 +50,6 @@ class Runner
       GC.copy_on_write_friendly = true if ( GC.copy_on_write_friendly? rescue false )
       rd.close
 
-      puts options[:limit]
       RateLimit.configure do |config|
         config.redis = Redis.connect(url: options[:redis_uri])
         config.register :test, options[:limit], 1

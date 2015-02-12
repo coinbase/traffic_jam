@@ -15,14 +15,14 @@ module RateLimit
       used + amount > max
     end
 
-    def increment(amount = 1)
+    def increment(amount = 1, time: Time.now)
       return amount > 0 if max.zero?
 
       if amount != amount.to_i
         raise ArgumentError.new("Amount must be an integer")
       end
 
-      timestamp = (Time.now.to_f * 1000).round
+      timestamp = (time.to_f * 1000).round
       argv = [timestamp, amount.to_i, max, period * 1000]
 
       result =
@@ -36,15 +36,15 @@ module RateLimit
       !!result
     end
 
-    def increment!(amount = 1)
-      if !increment(amount)
+    def increment!(amount = 1, time: Time.now)
+      if !increment(amount, time: time)
         raise RateLimit::ExceededError.new(self)
       end
     end
 
-    def decrement(amount = 1)
+    def decrement(amount = 1, time: Time.now)
       return true if max.zero?
-      increment(-amount)
+      increment(-amount, time: time)
     end
 
     def reset
@@ -81,13 +81,13 @@ module RateLimit
 
     def key
       if @key.nil?
-        value =
+        converted_value =
           begin
             value.to_rate_limit_value
           rescue NoMethodError
             value
           end
-        hash = Digest::MD5.base64digest(value.to_s)
+        hash = Digest::MD5.base64digest(converted_value.to_s)
         hash = hash[0...config.hash_length] if config.hash_length
         @key = "#{config.key_prefix}:#{action}:#{hash}"
       end
