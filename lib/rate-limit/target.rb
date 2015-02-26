@@ -88,7 +88,7 @@ module RateLimit
             value
           end
         hash = Digest::MD5.base64digest(converted_value.to_s)
-        hash = hash[0...config.hash_length] if config.hash_length
+        hash = hash[0...config.hash_length]
         @key = "#{config.key_prefix}:#{action}:#{hash}"
       end
       @key

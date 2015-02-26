@@ -9,68 +9,87 @@ Instead of guaranteeing that the number of actions will never exceed the cap the
 ```
 require 'rate-limit'
 
-limit = RateLimit.new(:requests_per_user, 3, 1)
-limit.increment("user1")      # => true
-limit.increment("user1", 2)   # => true
-limit.increment("user1")      # => false
+RateLimit.configure do |config|
+  config.redis = Redis.new(url: REDIS_URL)
+end
+
+limit = RateLimit::Target.new(
+  :requests_per_user, "user1",
+  max: 3, period: 1
+)
+limit.increment      # => true
+limit.increment(2)   # => true
+limit.increment      # => false
 
 sleep 1
 
-limit.increment("user1", 2)   # => true
-limit.exceeded?("user1", 1)   # => false
-limit.exceeded?("user1", 2)   # => true
+limit.increment(2)   # => true
+limit.exceeded?      # => false
+limit.exceeded?(2)   # => true
 
-limit.used("user1")  # => 2
-limit.used("user1")  # => 1
+limit.used           # => 2
+limit.remaining      # => 1
 ```
 
 *For all methods, `value` must be a string or convertible to a distinct string when `to_s` is called.*
 
-### Constructor
+### RateLimit::Target
 
-`RateLimit.new(*action name*, *cap*, *period in seconds*)`
+**initialize(action, value, max: *cap*, period: *period in seconds*)**
 
-### increment(value, amount = 1)
+Constructor for `RateLimit::Target` takes an action name as a symbol, an integer maximum cap, and the period of limit in seconds. `max` and `period` are required keyword arguments. The value should be a string or convertible to a distinct string when `to_s` is called. If you would like to use objects that can be converted to a unique string, like a database-mapped object, you can implement `to_rate_limit_value` on the object, which returns a deterministic string unique to that object.
+
+**increment(amount = 1)**
 
 Increment the amount used by the given number. Returns true if increment succeded and false if incrementing would exceed the limit.
 
-### decrement(value, amount = 1)
+**decrement(amount = 1)**
 
 Decrement the amount used by the given number. Will never decrement below 0. Always returns true.
 
-### increment!(value, amount = 1)
+**increment!(amount = 1)**
 
 Increment the amount used by the given number. Raises `RateLimit::ExceededError` if incrementing would exceed the limit.
 
-### exceeded?(value, amount = 1)
+**exceeded?(amount = 1)**
 
 Return whether incrementing by the given amount would exceed limit. Does not change amount used.
 
-### reset(value)
+**reset**
 
 Sets amount used to 0.
 
-### used(value)
+**used**
 
 Return current amount used.
 
-### remaining(value)
+**remaining**
 
 Return current amount remaining.
 
-### reset_all
+**RateLimit.reset_all(action: nil)**
 
-Reset all limits. *Warning: Not to be used in production.*
+Reset all limits associated with the given action. If action is omitted or nil, this will reset all limits. *Warning: Not to be used in production.*
 
-## Registering limits
+## Configuration
+
+RateLimit configuration object can be accessed with `RateLimit.config` or in a block like `RateLimit.configure { |config| ... }`. Configuration options are:
+
+**redis** (required): A Redis instance to store amounts used for each limit target.
+
+**key_prefix** (default: "rate_limit"): The string prefixing all keys in Redis.
+
+### Registering limits
 
 Fixed limits can be registered for a key if the cap does not change depending on the value. All instance methods are available on the class.
 
 ```
-RateLimit.register(:requests_per_user, 3, 1)
+RateLimit.configure do |config|
+  config.register(:requests_per_user, 3, 1)
+end
 
-limit = RateLimit.find(:requests_per_user)
-limit.increment("user1", 2)  # => true
+limit = RateLimit.target(:requests_per_user, "user1")
+limit.increment(2)  # => true
 
 RateLimit.increment(:requests_per_user, "user1", 1)  # => true
 RateLimit.used(:requests_per_user, "user1")          # => 3
@@ -78,23 +97,29 @@ RateLimit.used(:requests_per_user, "user1")          # => 3
 
 ## Changing limit cap for a value
 
-Given an instance of `RateLimit` with a maximum cap and a period, the behavior is to increase the amount remaining at a rate of *max / period* since the last time `increment` was called for the given value. If the cap is defined on a per-value basis, it is good practice to call `increment(value, 0)` if the limit changes.
+Given an instance of `RateLimit::Target` with a maximum cap and a period, the behavior is to increase the amount remaining at a rate of *max / period* since the last time `increment` was called for the given value. If the cap is defined on a per-value basis, it is good practice to call `increment(0)` if the limit changes.
 
 For example:
 
 ```
 user.requests_per_hour = 10
 
-limit = RateLimit.new(:requests_per_user, user.requests_per_hour, 60 * 60)
-limit.increment(user.id, 8)  # => true
+limit = RateLimit::Target.new(
+  :requests_per_user, user.id,
+  max: user.requests_per_hour, period: 60 * 60
+)
+limit.increment(8)  # => true
 
 sleep 60
 
-limit.increment(value, 0)
+limit.increment(0)
 
 user.requests_per_hour = 20
-limit = RateLimit.new(:requests_per_user, user.requests_per_hour, 60 * 60)
-limit.increment(user.id, 8)  # => true
+limit = RateLimit::Target.new(
+  :requests_per_user, user.id,
+  max: user.requests_per_hour, period: 60 * 60
+)
+limit.increment(8)  # => true
 ```
 
 ## Running tests

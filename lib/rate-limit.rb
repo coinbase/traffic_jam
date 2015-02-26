@@ -10,7 +10,8 @@ module RateLimit
   include Errors
 
   @config = Configuration.new(
-    key_prefix: 'rate_limit'
+    key_prefix: 'rate_limit',
+    hash_length: 22
   )
 
   class << self
