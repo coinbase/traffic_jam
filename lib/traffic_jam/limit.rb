@@ -1,8 +1,7 @@
 require_relative 'scripts'
 
-
-module RateLimit
-  class Target
+module TrafficJam
+  class Limit
     attr_reader :action, :max, :period, :value
 
     def initialize(action, value, max: nil, period: nil)
@@ -38,7 +37,7 @@ module RateLimit
 
     def increment!(amount = 1, time: Time.now)
       if !increment(amount, time: time)
-        raise RateLimit::ExceededError.new(self)
+        raise TrafficJam::LimitExceededError.new(self)
       end
     end
 
@@ -72,7 +71,7 @@ module RateLimit
 
     private
     def config
-      RateLimit.config
+      TrafficJam.config
     end
 
     def redis

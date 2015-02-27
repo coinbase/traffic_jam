@@ -1,4 +1,4 @@
-module RateLimit
+module TrafficJam
   class Configuration
     OPTIONS = %i( key_prefix hash_length redis )
     attr_accessor *OPTIONS
@@ -25,7 +25,7 @@ module RateLimit
     def limits(action)
       @limits ||= {}
       limits = @limits[action.to_sym]
-      raise RateLimit::LimitNotFound.new(action) if limits.nil?
+      raise TrafficJam::LimitNotFound.new(action) if limits.nil?
       limits
     end
   end
