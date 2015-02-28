@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'rate-limit'
+require 'traffic_jam'
 require 'json'
 require 'redis'
 require 'optparse'
@@ -35,7 +35,7 @@ class Runner
     results = Hash[ (0...options[:keys]).map { |i| [ i, [ 0, 0 ] ] } ]
     options[:actions].times do
       i = results.keys.sample
-      if RateLimit.increment(:test, "val#{i}")
+      if TrafficJam.increment(:test, "val#{i}")
         results[i][0] += 1
       else
         results[i][1] += 1
@@ -50,7 +50,7 @@ class Runner
       GC.copy_on_write_friendly = true if ( GC.copy_on_write_friendly? rescue false )
       rd.close
 
-      RateLimit.configure do |config|
+      TrafficJam.configure do |config|
         config.redis = Redis.connect(url: options[:redis_uri])
         config.register :test, options[:limit], 1
       end

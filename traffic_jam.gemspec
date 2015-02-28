@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.name        = "rate-limit"
+  s.name        = "traffic_jam"
   s.version     = "0.1.0"
   s.licenses    = ["MIT"]
   s.summary     = "Library for time-based rate limiting"

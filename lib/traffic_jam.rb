@@ -1,16 +1,16 @@
 require 'ostruct'
 require 'digest/md5'
-require_relative 'rate-limit/errors'
-require_relative 'rate-limit/configuration'
-require_relative 'rate-limit/target'
-require_relative 'rate-limit/target-group'
+require_relative 'traffic_jam/errors'
+require_relative 'traffic_jam/configuration'
+require_relative 'traffic_jam/limit'
+require_relative 'traffic_jam/limit_group'
 
 
-module RateLimit
+module TrafficJam
   include Errors
 
   @config = Configuration.new(
-    key_prefix: 'rate_limit',
+    key_prefix: 'traffic_jam',
     hash_length: 22
   )
 
@@ -21,9 +21,9 @@ module RateLimit
       yield config
     end
 
-    def target(action, value)
+    def limit(action, value)
       limits = config.limits(action.to_sym)
-      RateLimit::Target.new(action, value, **limits)
+      TrafficJam::Limit.new(action, value, **limits)
     end
 
     def reset_all(action: nil)
@@ -41,7 +41,7 @@ module RateLimit
     %w( exceeded? increment increment! decrement reset used remaining )
       .each do |method|
       define_method(method) do |action, value, *args|
-        target(action, value).send(method, *args)
+        limit(action, value).send(method, *args)
       end
     end
   end

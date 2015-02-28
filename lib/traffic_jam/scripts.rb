@@ -1,6 +1,6 @@
 require 'digest/sha1'
 
-module RateLimit
+module TrafficJam
   module Scripts
     def self.load(name)
       scripts_dir = File.join(File.dirname(__FILE__), '..', '..', 'scripts')
