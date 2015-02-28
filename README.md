@@ -1,4 +1,4 @@
-# RateLimit
+# TrafficJam
 
 This is a library for enforcing time based rate limits. This can be used to cap the number of actions that may be performed by one actor. Alternatively, this can be used to enforce any integral cap on an amount that can be incremented/decremented by arbitrary integer amounts. A limit consists of an action name, a maximum amount, and a period of time in seconds.
 
@@ -7,13 +7,13 @@ Instead of guaranteeing that the number of actions will never exceed the cap the
 ## Usage
 
 ```
-require 'rate-limit'
+require 'traffic_jam'
 
-RateLimit.configure do |config|
+TrafficJam.configure do |config|
   config.redis = Redis.new(url: REDIS_URL)
 end
 
-limit = RateLimit::Target.new(
+limit = TrafficJam::Limit.new(
   :requests_per_user, "user1",
   max: 3, period: 1
 )
@@ -31,13 +31,11 @@ limit.used           # => 2
 limit.remaining      # => 1
 ```
 
-*For all methods, `value` must be a string or convertible to a distinct string when `to_s` is called.*
-
-### RateLimit::Target
+### TrafficJam::Limit
 
 **initialize(action, value, max: *cap*, period: *period in seconds*)**
 
-Constructor for `RateLimit::Target` takes an action name as a symbol, an integer maximum cap, and the period of limit in seconds. `max` and `period` are required keyword arguments. The value should be a string or convertible to a distinct string when `to_s` is called. If you would like to use objects that can be converted to a unique string, like a database-mapped object, you can implement `to_rate_limit_value` on the object, which returns a deterministic string unique to that object.
+Constructor for `TrafficJam::Limit` takes an action name as a symbol, an integer maximum cap, and the period of limit in seconds. `max` and `period` are required keyword arguments. The value should be a string or convertible to a distinct string when `to_s` is called. If you would like to use objects that can be converted to a unique string, like a database-mapped object, you can implement `to_rate_limit_value` on the object, which returns a deterministic string unique to that object.
 
 **increment(amount = 1)**
 
@@ -49,7 +47,7 @@ Decrement the amount used by the given number. Will never decrement below 0. Alw
 
 **increment!(amount = 1)**
 
-Increment the amount used by the given number. Raises `RateLimit::ExceededError` if incrementing would exceed the limit.
+Increment the amount used by the given number. Raises `TrafficJam::LimitExceededError` if incrementing would exceed the limit.
 
 **exceeded?(amount = 1)**
 
@@ -67,44 +65,44 @@ Return current amount used.
 
 Return current amount remaining.
 
-**RateLimit.reset_all(action: nil)**
+**TrafficJam.reset_all(action: nil)**
 
 Reset all limits associated with the given action. If action is omitted or nil, this will reset all limits. *Warning: Not to be used in production.*
 
 ## Configuration
 
-RateLimit configuration object can be accessed with `RateLimit.config` or in a block like `RateLimit.configure { |config| ... }`. Configuration options are:
+TrafficJam configuration object can be accessed with `TrafficJam.config` or in a block like `TrafficJam.configure { |config| ... }`. Configuration options are:
 
-**redis** (required): A Redis instance to store amounts used for each limit target.
+**redis** (required): A Redis instance to store amounts used for each limit.
 
-**key_prefix** (default: "rate_limit"): The string prefixing all keys in Redis.
+**key_prefix** (default: "traffic_jam"): The string prefixing all keys in Redis.
 
 ### Registering limits
 
 Fixed limits can be registered for a key if the cap does not change depending on the value. All instance methods are available on the class.
 
 ```
-RateLimit.configure do |config|
+TrafficJam.configure do |config|
   config.register(:requests_per_user, 3, 1)
 end
 
-limit = RateLimit.target(:requests_per_user, "user1")
+limit = TrafficJam.limit(:requests_per_user, "user1")
 limit.increment(2)  # => true
 
-RateLimit.increment(:requests_per_user, "user1", 1)  # => true
-RateLimit.used(:requests_per_user, "user1")          # => 3
+TrafficJam.increment(:requests_per_user, "user1", 1)  # => true
+TrafficJam.used(:requests_per_user, "user1")          # => 3
 ```
 
 ## Changing limit cap for a value
 
-Given an instance of `RateLimit::Target` with a maximum cap and a period, the behavior is to increase the amount remaining at a rate of *max / period* since the last time `increment` was called for the given value. If the cap is defined on a per-value basis, it is good practice to call `increment(0)` if the limit changes.
+Given an instance of `TrafficJam::Limit` with a maximum cap and a period, the behavior is to increase the amount remaining at a rate of *max / period* since the last time `increment` was called for the given value. If the cap is defined on a per-value basis, it is good practice to call `increment(0)` if the limit changes.
 
 For example:
 
 ```
 user.requests_per_hour = 10
 
-limit = RateLimit::Target.new(
+limit = TrafficJam::Limit.new(
   :requests_per_user, user.id,
   max: user.requests_per_hour, period: 60 * 60
 )
@@ -115,7 +113,7 @@ sleep 60
 limit.increment(0)
 
 user.requests_per_hour = 20
-limit = RateLimit::Target.new(
+limit = TrafficJam::Limit.new(
   :requests_per_user, user.id,
   max: user.requests_per_hour, period: 60 * 60
 )
