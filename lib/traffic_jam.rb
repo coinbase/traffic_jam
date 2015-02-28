@@ -21,7 +21,7 @@ module TrafficJam
       yield config
     end
 
-    def target(action, value)
+    def limit(action, value)
       limits = config.limits(action.to_sym)
       TrafficJam::Limit.new(action, value, **limits)
     end
@@ -41,7 +41,7 @@ module TrafficJam
     %w( exceeded? increment increment! decrement reset used remaining )
       .each do |method|
       define_method(method) do |action, value, *args|
-        target(action, value).send(method, *args)
+        limit(action, value).send(method, *args)
       end
     end
   end

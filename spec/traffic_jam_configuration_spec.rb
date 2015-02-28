@@ -1,18 +1,16 @@
-require 'rate-limit'
+require 'traffic_jam'
 require_relative 'spec_helper'
 
-
-describe RateLimit do
+describe TrafficJam do
   include RedisHelper
 
-  let(:config) { RateLimit::Configuration.new }
+  let(:config) { TrafficJam::Configuration.new }
 
   before { config.register(:test, 3, 60) }
 
-
   describe 'constructor' do
     it "should take default options" do
-      config = RateLimit::Configuration.new(key_prefix: 'hello')
+      config = TrafficJam::Configuration.new(key_prefix: 'hello')
       config.key_prefix = 'hello'
     end
   end
