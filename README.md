@@ -1,5 +1,7 @@
 # TrafficJam
 
+[![Build Status](https://travis-ci.org/coinbase/traffic_jam.svg?branch=master)](https://travis-ci.org/coinbase/traffic_jam)
+
 This is a library for enforcing time based rate limits. This can be used to cap the number of actions that may be performed by one actor. Alternatively, this can be used to enforce any integral cap on an amount that can be incremented/decremented by arbitrary integer amounts. A limit consists of an action name, a maximum amount, and a period of time in seconds.
 
 Instead of guaranteeing that the number of actions will never exceed the cap the given timeframe, the approach we take is to use a continuously regenerating limit. The amount remaining will constantly increase at a rate of *max / period* until it hits the cap. If, for example, the limit is 60 per minute, a user could increment by 60 at once, then increment by 1 per second forever without hitting the cap. As a consequence, *this algorithm guarantees that the total amount incremented will be less than twice the limit in any given timeframe*.
