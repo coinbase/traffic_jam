@@ -9,6 +9,6 @@ Gem::Specification.new do |s|
   s.files       = Dir.glob("lib}/**/*.rb") + Dir.glob("scripts/**/*.lua")
   s.homepage    = ""
 
-  s.add_dependency 'redis', '~> 3.1'
+  s.add_dependency 'redis', '~> 3.0'
   s.add_development_dependency 'rake', '~> 10.0'
 end

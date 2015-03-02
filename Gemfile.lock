@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     traffic_jam (0.1.0)
-      redis (~> 3.1)
+      redis (~> 3.0)
 
 GEM
   remote: https://rubygems.org/
