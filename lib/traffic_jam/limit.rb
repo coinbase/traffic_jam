@@ -15,7 +15,7 @@ module TrafficJam
     end
 
     def increment(amount = 1, time: Time.now)
-      return amount > 0 if max.zero?
+      return amount <= 0 if max.zero?
 
       if amount != amount.to_i
         raise ArgumentError.new("Amount must be an integer")
@@ -42,7 +42,6 @@ module TrafficJam
     end
 
     def decrement(amount = 1, time: Time.now)
-      return true if max.zero?
       increment(-amount, time: time)
     end
 

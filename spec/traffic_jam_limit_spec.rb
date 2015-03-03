@@ -50,6 +50,16 @@ describe TrafficJam do
       limit.increment(1)
       assert_equal 1, eval_spy.calls.count
     end
+
+    describe "when max is zero" do
+      let(:limit) do
+        TrafficJam::Limit.new(:test, "user1", max: 0, period: 60 * 60)
+      end
+
+      it "should be false for any positive amount" do
+        assert !limit.increment
+      end
+    end
   end
 
   describe :increment! do
