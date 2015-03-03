@@ -2,8 +2,8 @@ module TrafficJam
   class LimitGroup
     attr_reader :limits
 
-    def initialize(limits)
-      @limits = limits
+    def initialize(*limits)
+      @limits = limits.flatten
     end
 
     def <<(limit)

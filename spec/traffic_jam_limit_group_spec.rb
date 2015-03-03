@@ -15,6 +15,23 @@ describe TrafficJam do
   end
   let(:limit_group) { TrafficJam::LimitGroup.new([limit1, limit2]) }
 
+  describe :constructor do
+    it "should accept an array of limits" do
+      limit_group = TrafficJam::LimitGroup.new([limit1, limit2])
+      assert_equal 2, limit_group.limits.size
+    end
+
+    it "should accept a splat of limits" do
+      limit_group = TrafficJam::LimitGroup.new(limit1, limit2)
+      assert_equal 2, limit_group.limits.size
+    end
+
+    it "should accept no arguments" do
+      limit_group = TrafficJam::LimitGroup.new
+      assert_equal 0, limit_group.limits.size
+    end
+  end
+
   describe :increment do
     it "should be nil when no limit targets are exceeded" do
       assert_nil limit_group.increment(2)
