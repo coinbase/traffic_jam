@@ -9,7 +9,7 @@ Instead of guaranteeing that the number of actions will never exceed the cap the
 
 ## Usage
 
-```
+```ruby
 require 'traffic_jam'
 
 TrafficJam.configure do |config|
@@ -84,7 +84,7 @@ TrafficJam configuration object can be accessed with `TrafficJam.config` or in a
 
 Fixed limits can be registered for a key if the cap does not change depending on the value. All instance methods are available on the class.
 
-```
+```ruby
 TrafficJam.configure do |config|
   config.register(:requests_per_user, 3, 1)
 end
@@ -102,7 +102,7 @@ Given an instance of `TrafficJam::Limit` with a maximum cap and a period, the be
 
 For example:
 
-```
+```ruby
 user.requests_per_hour = 10
 
 limit = TrafficJam::Limit.new(
