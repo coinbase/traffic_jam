@@ -1,4 +1,3 @@
-require 'traffic_jam'
 require_relative 'spec_helper'
 
 describe TrafficJam do
