@@ -91,4 +91,13 @@ describe TrafficJam do
       assert_equal 1, limit2.used
     end
   end
+
+  describe :<< do
+    it "should add limit to the group" do
+      limit_group = TrafficJam::LimitGroup.new([limit1])
+      assert_equal 1, limit_group.limits.size
+      limit_group << limit2
+      assert_equal 2, limit_group.limits.size
+    end
+  end
 end

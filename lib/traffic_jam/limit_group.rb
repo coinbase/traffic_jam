@@ -1,7 +1,13 @@
 module TrafficJam
   class LimitGroup
+    attr_reader :limits
+
     def initialize(limits)
       @limits = limits
+    end
+
+    def <<(limit)
+      @limits << limit
     end
 
     def increment(amount = 1)
