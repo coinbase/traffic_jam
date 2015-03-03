@@ -1,8 +1,8 @@
 require 'redis'
 require 'timecop'
+require 'simplecov'
 require 'minitest/autorun'
 require 'spy/integration'
-require 'simplecov'
 
 SimpleCov.start :test_frameworks
 
