@@ -1,6 +1,7 @@
 # TrafficJam
 
 [![Build Status](https://travis-ci.org/coinbase/traffic_jam.svg?branch=master)](https://travis-ci.org/coinbase/traffic_jam)
+[![Coverage Status](https://coveralls.io/repos/coinbase/traffic_jam/badge.svg?branch=master)](https://coveralls.io/r/coinbase/traffic_jam?branch=master)
 
 This is a library for enforcing time based rate limits. This can be used to cap the number of actions that may be performed by one actor. Alternatively, this can be used to enforce any integral cap on an amount that can be incremented/decremented by arbitrary integer amounts. A limit consists of an action name, a maximum amount, and a period of time in seconds.
 
