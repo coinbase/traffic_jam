@@ -7,47 +7,59 @@ module TrafficJam
     end
 
     def <<(limit)
-      @limits << limit
+      limits << limit
     end
 
     def increment(amount = 1)
       time = Time.now
-      exceeded_index = @limits.find_index do |limit|
+      exceeded_index = limits.find_index do |limit|
         !limit.increment(amount, time: time)
       end
-
-      if exceeded_index.nil?
-        nil
-      else
-        @limits[0...exceeded_index].each do |limit|
+      if exceeded_index
+        limits[0...exceeded_index].each do |limit|
           limit.decrement(amount, time: time)
         end
-        @limits[exceeded_index]
       end
+      exceeded_index.nil?
     end
 
     def increment!(amount = 1)
-      limit = increment(amount)
-      if !limit.nil?
-        raise TrafficJam::LimitExceededError.new(limit)
+      time = Time.now
+      exceeded_index = limits.find_index do |limit|
+        !limit.increment(amount, time: time)
+      end
+      if exceeded_index
+        limits[0...exceeded_index].each do |limit|
+          limit.decrement(amount, time: time)
+        end
+        raise TrafficJam::LimitExceededError.new(limits[exceeded_index])
+      elsif block_given?
+        begin
+          yield
+        rescue => e
+          limits.each do |limit|
+            limit.decrement(amount, time: time)
+          end
+          raise e
+        end
       end
     end
 
     def decrement(amount = 1)
-      @limits.all? { |limit| limit.decrement(amount) }
+      limits.all? { |limit| limit.decrement(amount) }
     end
 
     def exceeded?(amount = 1)
-      @limits.find { |limit| limit.exceeded?(amount) }
+      limits.find { |limit| limit.exceeded?(amount) }
     end
 
     def reset
-      @limits.each(&:reset)
+      limits.each(&:reset)
       nil
     end
 
     def remaining
-      @limits.map(&:remaining).min
+      limits.map(&:remaining).min
     end
   end
 end

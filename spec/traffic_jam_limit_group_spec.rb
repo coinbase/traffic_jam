@@ -33,15 +33,15 @@ describe TrafficJam do
   end
 
   describe :increment do
-    it "should be nil when no limit targets are exceeded" do
-      assert_nil limit_group.increment(2)
+    it "should be true when no limits are exceeded" do
+      assert limit_group.increment(2)
     end
 
-    it "should be the first limit target to be exceeded" do
-      assert_equal limit2, limit_group.increment(3)
+    it "should false when any limit is exceeded" do
+      assert !limit_group.increment(3)
     end
 
-    it "should be increment all limit targets when none are exceeded" do
+    it "should be increment all limits when none are exceeded" do
       limit_group.increment(2)
       assert_equal 2, limit1.used
       assert_equal 2, limit2.used
@@ -55,7 +55,7 @@ describe TrafficJam do
   end
 
   describe :increment! do
-    it "should be increment all limit targets when none are exceeded" do
+    it "should increment all limits when none are exceeded" do
       limit_group.increment!(2)
       assert_equal 2, limit1.used
       assert_equal 2, limit2.used
@@ -67,6 +67,31 @@ describe TrafficJam do
       end
       assert_equal 0, limit1.used
       assert_equal 0, limit2.used
+    end
+
+    describe "when passed a block" do
+      it "should return result of block" do
+        called = false
+        block = ->{ called = true; :result }
+        assert_equal :result, limit_group.increment!(2, &block)
+        assert called
+      end
+
+      it "should not execute block when any limit is exceeded" do
+        called = false
+        assert_raises(TrafficJam::LimitExceededError) do
+          limit_group.increment!(3) { called = true }
+        end
+        assert !called
+      end
+
+      it "should not increment limits if block raises an exception" do
+        assert_raises(StandardError) do
+          limit_group.increment!(2) { raise StandardError.new }
+        end
+        assert_equal 0, limit1.used
+        assert_equal 0, limit2.used
+      end
     end
   end
 
@@ -83,7 +108,7 @@ describe TrafficJam do
   end
 
   describe :remaining do
-    it "should be the minimum amount remaining of all targets" do
+    it "should be the minimum amount remaining of all limits" do
       assert_equal 2, limit_group.remaining
       limit1.increment!(2)
       assert_equal 1, limit_group.remaining
