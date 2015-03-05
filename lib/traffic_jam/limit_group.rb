@@ -10,8 +10,7 @@ module TrafficJam
       limits << limit
     end
 
-    def increment(amount = 1)
-      time = Time.now
+    def increment(amount = 1, time: Time.now)
       exceeded_index = limits.find_index do |limit|
         !limit.increment(amount, time: time)
       end
@@ -23,8 +22,7 @@ module TrafficJam
       exceeded_index.nil?
     end
 
-    def increment!(amount = 1)
-      time = Time.now
+    def increment!(amount = 1, time: Time.now)
       exceeded_index = limits.find_index do |limit|
         !limit.increment(amount, time: time)
       end
@@ -45,8 +43,8 @@ module TrafficJam
       end
     end
 
-    def decrement(amount = 1)
-      limits.all? { |limit| limit.decrement(amount) }
+    def decrement(amount = 1, time: Time.now)
+      limits.all? { |limit| limit.decrement(amount, time: time) }
     end
 
     def exceeded?(amount = 1)
