@@ -32,14 +32,15 @@ module TrafficJam
         end
         raise TrafficJam::LimitExceededError.new(limits[exceeded_index])
       elsif block_given?
-        begin
-          yield
-        rescue => e
-          limits.each do |limit|
-            limit.decrement(amount, time: time)
+        result =
+          begin
+            yield
+          rescue => e
+            decrement(amount, time: time)
+            raise e
           end
-          raise e
-        end
+        decrement(amount, time: time) if result == false
+        result
       end
     end
 

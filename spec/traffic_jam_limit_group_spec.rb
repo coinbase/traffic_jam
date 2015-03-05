@@ -92,6 +92,18 @@ describe TrafficJam do
         assert_equal 0, limit1.used
         assert_equal 0, limit2.used
       end
+
+      it "should not increment limits if block evaluates to false" do
+        limit_group.increment!(2) { false }
+        assert_equal 0, limit1.used
+        assert_equal 0, limit2.used
+      end
+
+      it "should increment limits if block evaluates to nil" do
+        limit_group.increment!(2) { nil }
+        assert_equal 2, limit1.used
+        assert_equal 2, limit2.used
+      end
     end
   end
 
