@@ -23,10 +23,12 @@ else
          return true
       end
       local old_amount = tonumber(redis.call("HGET", KEYS[1], "amount"))
+      old_amount = math.min(old_amount, arg_max)
       new_amount = old_amount + incr_amount
       new_timestamp = old_timestamp
    else
       local old_amount = tonumber(redis.call("HGET", KEYS[1], "amount"))
+      old_amount = math.min(old_amount, arg_max)
       local current_amount = math.max(old_amount - drift_amount, 0)
       new_amount = current_amount + arg_amount
       new_timestamp = arg_timestamp

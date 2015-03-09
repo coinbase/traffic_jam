@@ -60,6 +60,19 @@ describe TrafficJam do
         assert !limit.increment
       end
     end
+
+    describe "when max is changed to a lower amount" do
+      it "should still expire after period" do
+        limit = TrafficJam::Limit.new(:test, "user1", max: 4, period: 60)
+        limit.increment!(4)
+
+        limit = TrafficJam::Limit.new(:test, "user1", max: 2, period: 60)
+        limit.increment!(0)
+
+        Timecop.travel(period)
+        assert_equal 0, limit.used
+      end
+    end
   end
 
   describe :increment! do
