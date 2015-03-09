@@ -14,6 +14,10 @@ module TrafficJam
       used + amount > max
     end
 
+    def limit_exceeded(amount = 1)
+      self if exceeded?(amount)
+    end
+
     def increment(amount = 1, time: Time.now)
       return amount <= 0 if max.zero?
 

@@ -108,14 +108,26 @@ describe TrafficJam do
   end
 
   describe :exceeded? do
+    it "should be true when an limit would be exceeded" do
+      limit_group.increment(2)
+      assert limit_group.exceeded?(1)
+    end
+
+    it "should be false when amount would not exceed any limit" do
+      limit_group.increment(1)
+      assert !limit_group.exceeded?(1)
+    end
+  end
+
+  describe :limit_exceeded do
     it "should be the limit that would exceed limit" do
       limit_group.increment(2)
-      assert_equal limit2, limit_group.exceeded?(1)
+      assert_equal limit2, limit_group.limit_exceeded(1)
     end
 
     it "should be nil when amount would not exceed limit" do
       limit_group.increment(1)
-      assert_nil limit_group.exceeded?(1)
+      assert_nil limit_group.limit_exceeded(1)
     end
   end
 

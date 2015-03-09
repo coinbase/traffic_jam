@@ -49,7 +49,11 @@ module TrafficJam
     end
 
     def exceeded?(amount = 1)
-      limits.find { |limit| limit.exceeded?(amount) }
+      limits.any? { |limit| limit.exceeded?(amount) }
+    end
+
+    def limit_exceeded(amount = 1)
+      limits.find { |limit| limit.limit_exceeded(amount) }
     end
 
     def reset
