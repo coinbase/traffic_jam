@@ -53,7 +53,11 @@ module TrafficJam
     end
 
     def limit_exceeded(amount = 1)
-      limits.find { |limit| limit.limit_exceeded(amount) }
+      limits.each do |limit|
+        limit_exceeded = limit.limit_exceeded(amount)
+        return limit_exceeded if limit_exceeded
+      end
+      nil
     end
 
     def reset
