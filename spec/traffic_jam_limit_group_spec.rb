@@ -105,6 +105,17 @@ describe TrafficJam do
         assert_equal 2, limit2.used
       end
     end
+
+    describe "when group contains other groups" do
+      let(:meta_group) { TrafficJam::LimitGroup.new(limit_group) }
+
+      it "should raise error with limit instance" do
+        exception = assert_raises(TrafficJam::LimitExceededError) do
+          meta_group.increment!(3)
+        end
+        assert_equal limit2, exception.limit
+      end
+    end
   end
 
   describe :exceeded? do

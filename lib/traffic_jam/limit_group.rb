@@ -23,14 +23,20 @@ module TrafficJam
     end
 
     def increment!(amount = 1, time: Time.now)
+      exception = nil
       exceeded_index = limits.find_index do |limit|
-        !limit.increment(amount, time: time)
+        begin
+          limit.increment!(amount, time: time)
+        rescue TrafficJam::LimitExceededError => e
+          exception = e
+          true
+        end
       end
       if exceeded_index
         limits[0...exceeded_index].each do |limit|
           limit.decrement(amount, time: time)
         end
-        raise TrafficJam::LimitExceededError.new(limits[exceeded_index])
+        raise exception
       elsif block_given?
         result =
           begin
