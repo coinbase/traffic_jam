@@ -72,6 +72,10 @@ module TrafficJam
       max - used
     end
 
+    def flatten
+      [self]
+    end
+
     private
     def config
       TrafficJam.config

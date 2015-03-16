@@ -68,5 +68,9 @@ module TrafficJam
     def remaining
       limits.map(&:remaining).min
     end
+
+    def flatten
+      limits.map(&:flatten).flatten
+    end
   end
 end

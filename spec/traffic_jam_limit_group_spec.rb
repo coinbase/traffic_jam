@@ -166,4 +166,12 @@ describe TrafficJam do
       assert_equal 2, limit_group.limits.size
     end
   end
+
+  describe :flatten do
+    let(:meta_group) { TrafficJam::LimitGroup.new(limit_group) }
+
+    it "should be a flattened list of limits" do
+      assert_equal [limit1, limit2], meta_group.flatten
+    end
+  end
 end
