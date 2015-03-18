@@ -62,7 +62,8 @@ module TrafficJam
       if timestamp && amount
         time_passed = Time.now.to_f - timestamp.to_i / 1000.0
         drift = max * time_passed / period
-        [(amount.to_f - drift).ceil, 0].max
+        last_amount = [amount.to_f, max].min
+        [(last_amount - drift).ceil, 0].max
       else
         0
       end

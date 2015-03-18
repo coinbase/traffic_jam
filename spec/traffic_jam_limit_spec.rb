@@ -115,6 +115,12 @@ describe TrafficJam do
       Timecop.travel(period / 2)
       assert_equal 1, limit.used
     end
+
+    it "should not exceed maximum when limit changes" do
+      limit.increment!(3)
+      limit2 = TrafficJam::Limit.new(:test, "user1", max: 2, period: 60 * 60)
+      assert_equal 2, limit2.used
+    end
   end
 
   describe :reset do
