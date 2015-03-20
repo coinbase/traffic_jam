@@ -17,8 +17,10 @@ TrafficJam.configure do |config|
 end
 
 limit = TrafficJam::Limit.new(
-  :requests_per_user, "user1",
-  max: 3, period: 1
+  :requests_per_user,
+  user.id,
+  max: 3,
+  period: 1 # seconds
 )
 limit.increment      # => true
 limit.increment(2)   # => true
