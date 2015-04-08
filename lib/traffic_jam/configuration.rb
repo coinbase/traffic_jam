@@ -14,6 +14,12 @@ module TrafficJam
       @limits[action.to_sym] = { max: max, period: period }
     end
 
+    def unregister(action)
+      if @limits
+        @limits.delete(action.to_sym)
+      end
+    end
+
     def max(action)
       limits(action)[:max]
     end
