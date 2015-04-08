@@ -25,4 +25,16 @@ describe TrafficJam do
       assert_equal 60, config.period(:test)
     end
   end
+
+  describe '.unregister' do
+    it "should remove unregistered actions" do
+      config.register(:test_2, 1, 1)
+      assert_equal({max: 1, period: 1}, config.limits(:test_2))
+
+      config.unregister(:test_2)
+      assert_raises(TrafficJam::LimitNotFound) do
+        config.limits(:test_2)
+      end
+    end
+  end
 end
