@@ -30,6 +30,19 @@ describe TrafficJam do
       limit_group = TrafficJam::LimitGroup.new
       assert_equal 0, limit_group.limits.size
     end
+
+    describe "when ingnore_nil_values flag is set" do
+      let(:limit2) do
+        TrafficJam::Limit.new(:test, nil, max: 2, period: 60 * 60)
+      end
+      let(:limit_group) do
+        TrafficJam::LimitGroup.new([limit1, limit2], ignore_nil_values: true)
+      end
+
+      it "should drop limits where value is nil" do
+        assert_equal 1, limit_group.limits.size
+      end
+    end
   end
 
   describe :increment do
@@ -170,11 +183,27 @@ describe TrafficJam do
   end
 
   describe :<< do
+    let(:limit_group) { TrafficJam::LimitGroup.new([limit1]) }
+
     it "should add limit to the group" do
-      limit_group = TrafficJam::LimitGroup.new([limit1])
       assert_equal 1, limit_group.limits.size
       limit_group << limit2
       assert_equal 2, limit_group.limits.size
+    end
+
+    describe "when ignore_nil_values flag is set" do
+      let(:limit2) do
+        TrafficJam::Limit.new(:test, nil, max: 2, period: 60 * 60)
+      end
+      let(:limit_group) do
+        TrafficJam::LimitGroup.new([limit1], ignore_nil_values: true)
+      end
+
+      it "should drop limits where value is nil" do
+        assert_equal 1, limit_group.limits.size
+        limit_group << limit2
+        assert_equal 1, limit_group.limits.size
+      end
     end
   end
 

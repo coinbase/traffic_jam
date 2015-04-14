@@ -2,12 +2,20 @@ module TrafficJam
   class LimitGroup
     attr_reader :limits
 
-    def initialize(*limits)
+    def initialize(*limits, ignore_nil_values: false)
       @limits = limits.flatten
+      @ignore_nil_values = ignore_nil_values
+      if @ignore_nil_values
+        @limits.reject! do |limit|
+          limit.respond_to?(:value) && limit.value.nil?
+        end
+      end
     end
 
     def <<(limit)
-      limits << limit
+      if !(@ignore_nil_values && limit.value.nil?)
+        limits << limit
+      end
     end
 
     def increment(amount = 1, time: Time.now)
