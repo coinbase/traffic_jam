@@ -25,6 +25,7 @@ limit = TrafficJam::Limit.new(
 limit.increment      # => true
 limit.increment(2)   # => true
 limit.increment      # => false
+limit.increment!     # => raises TrafficJam::LimitExceededError
 
 sleep 1
 
@@ -35,80 +36,6 @@ limit.exceeded?(2)   # => true
 limit.used           # => 2
 limit.remaining      # => 1
 ```
-
-### TrafficJam::Limit
-
-**initialize(action, value, max: *cap*, period: *period in seconds*)**
-
-Constructor for `TrafficJam::Limit` takes an action name as a symbol, an integer maximum cap, and the period of limit in seconds. `max` and `period` are required keyword arguments. The value should be a string or convertible to a distinct string when `to_s` is called. If you would like to use objects that can be converted to a unique string, like a database-mapped object, you can implement `to_rate_limit_value` on the object, which returns a deterministic string unique to that object.
-
-**increment(amount = 1)**
-
-Increment the amount used by the given number. Returns true if increment succeded and false if incrementing would exceed the limit.
-
-**decrement(amount = 1)**
-
-Decrement the amount used by the given number. Will never decrement below 0. Always returns true.
-
-**increment!(amount = 1)**
-
-Increment the amount used by the given number. Raises `TrafficJam::LimitExceededError` if incrementing would exceed the limit.
-
-**exceeded?(amount = 1)**
-
-Return whether incrementing by the given amount would exceed limit. Does not change amount used.
-
-**reset**
-
-Sets amount used to 0.
-
-**used**
-
-Return current amount used.
-
-**remaining**
-
-Return current amount remaining.
-
-**TrafficJam.reset_all(action: nil)**
-
-Reset all limits associated with the given action. If action is omitted or nil, this will reset all limits. *Warning: Not to be used in production.*
-
-### TrafficJam::LimitGroup
-
-A limit group is a way of enforcing a cap over a set of limits with the guarantee that either all limits will be incremented or none. This is useful if you must check multiple limits before allowing an action to be taken.
-
-**initialize(\*limits)**
-
-Constructor for `TrafficJam::Limit` takes either an array or splat of limits or other limit groups.
-
-**increment(amount = 1)**
-
-Increment the limits by the given number. Returns true if all increments are successful and false if incrementing would exceed any rate limit.
-
-**decrement(amount = 1)**
-
-Decrement the limits by the given number. Will never decrement below 0. Always returns true.
-
-**increment!(amount = 1)**
-
-Increment the limits by the given number. Raises `TrafficJam::LimitExceededError` if incrementing would exceed the limit. Will not increment if error is raised.
-
-**exceeded?(amount = 1)**
-
-Return whether incrementing by the given amount would exceed any limit. Does not change amount used.
-
-**limit_exceeded(amount = 1)**
-
-Return the first `TrafficJam::Limit` that would be exceeded by this amount or `nil` if incrementing would be safe.
-
-**reset**
-
-Sets limits to 0.
-
-**remaining**
-
-Return minimum amount remaining of all limits.
 
 ## Configuration
 

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    traffic_jam (0.1.0)
+    traffic_jam (1.0.0)
       redis (~> 3.0)
 
 GEM
@@ -19,7 +19,7 @@ GEM
     multi_json (1.10.1)
     netrc (0.10.3)
     rake (10.4.2)
-    redis (3.2.0)
+    redis (3.2.1)
     rest-client (1.7.3)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
