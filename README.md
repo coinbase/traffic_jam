@@ -80,7 +80,7 @@ A limit group is a way of enforcing a cap over a set of limits with the guarante
 
 **initialize(\*limits)**
 
-Constructor for `TrafficJam::Limit` takes either an array or splat of limits.
+Constructor for `TrafficJam::Limit` takes either an array or splat of limits or other limit groups.
 
 **increment(amount = 1)**
 
@@ -97,6 +97,10 @@ Increment the limits by the given number. Raises `TrafficJam::LimitExceededError
 **exceeded?(amount = 1)**
 
 Return whether incrementing by the given amount would exceed any limit. Does not change amount used.
+
+**limit_exceeded(amount = 1)**
+
+Return the first `TrafficJam::Limit` that would be exceeded by this amount or `nil` if incrementing would be safe.
 
 **reset**
 
