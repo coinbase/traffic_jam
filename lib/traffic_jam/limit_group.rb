@@ -45,16 +45,6 @@ module TrafficJam
           limit.decrement(amount, time: time)
         end
         raise exception
-      elsif block_given?
-        result =
-          begin
-            yield
-          rescue => e
-            decrement(amount, time: time)
-            raise e
-          end
-        decrement(amount, time: time) if result == false
-        result
       end
     end
 

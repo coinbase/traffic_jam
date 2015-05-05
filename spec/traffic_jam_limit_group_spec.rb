@@ -82,43 +82,6 @@ describe TrafficJam do
       assert_equal 0, limit2.used
     end
 
-    describe "when passed a block" do
-      it "should return result of block" do
-        called = false
-        block = ->{ called = true; :result }
-        assert_equal :result, limit_group.increment!(2, &block)
-        assert called
-      end
-
-      it "should not execute block when any limit is exceeded" do
-        called = false
-        assert_raises(TrafficJam::LimitExceededError) do
-          limit_group.increment!(3) { called = true }
-        end
-        assert !called
-      end
-
-      it "should not increment limits if block raises an exception" do
-        assert_raises(StandardError) do
-          limit_group.increment!(2) { raise StandardError.new }
-        end
-        assert_equal 0, limit1.used
-        assert_equal 0, limit2.used
-      end
-
-      it "should not increment limits if block evaluates to false" do
-        limit_group.increment!(2) { false }
-        assert_equal 0, limit1.used
-        assert_equal 0, limit2.used
-      end
-
-      it "should increment limits if block evaluates to nil" do
-        limit_group.increment!(2) { nil }
-        assert_equal 2, limit1.used
-        assert_equal 2, limit2.used
-      end
-    end
-
     describe "when group contains other groups" do
       let(:meta_group) { TrafficJam::LimitGroup.new(limit_group) }
 
