@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.authors     = ["Jim Posen"]
   s.email       = "jimpo@coinbase.com"
   s.files       = Dir.glob("lib/**/*.rb") + Dir.glob("scripts/**/*.lua")
-  s.homepage    = ""
+  s.homepage    = "https://github.com/coinbase/traffic_jam"
 
   s.add_dependency 'redis', '~> 3.0'
   s.add_development_dependency 'rake', '~> 10.0'
