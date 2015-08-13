@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    traffic_jam (1.0.0)
+    traffic_jam (1.0.1)
       redis (~> 3.0)
 
 GEM
@@ -46,3 +46,6 @@ DEPENDENCIES
   spy (~> 0.4.1)
   timecop (~> 0.7.1)
   traffic_jam!
+
+BUNDLED WITH
+   1.10.3

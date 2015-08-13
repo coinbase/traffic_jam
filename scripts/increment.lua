@@ -17,8 +17,17 @@ else
    local drift_amount = time_diff * arg_max / arg_period
    if time_diff < 0
    then
-      local incr_amount = arg_amount + drift_amount
-      if incr_amount <= 0
+      local incr_amount
+      local incr_magnitude
+      if arg_amount < 0
+      then
+        incr_amount = arg_amount - drift_amount
+        incr_magnitude = -incr_amount
+      else
+        incr_amount = arg_amount + drift_amount
+        incr_magnitude = incr_amount
+      end
+      if incr_magnitude <= 0
       then
          return true
       end

@@ -51,6 +51,27 @@ describe TrafficJam do
       assert_equal 1, eval_spy.calls.count
     end
 
+    describe "when increment is processed for a past time" do
+      it "should discount the past increment by the time drift" do
+        time = Time.now
+        limit.increment(1, time: time)
+        limit.increment(2, time: time - period / 3)
+        assert_equal 2, limit.used
+      end
+    end
+
+    describe "when decrement is processed for a past time" do
+      it "should discount the past decrement by the time drift" do
+        time = Time.now
+        limit.increment(2, time: time - period / 3)
+        limit.increment(2, time: time)
+        assert_equal 3, limit.used
+
+        limit.decrement(2, time: time - period / 3)
+        assert_equal 2, limit.used
+      end
+    end
+
     describe "when max is zero" do
       let(:limit) do
         TrafficJam::Limit.new(:test, "user1", max: 0, period: 60 * 60)
