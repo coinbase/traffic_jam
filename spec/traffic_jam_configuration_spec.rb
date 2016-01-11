@@ -10,7 +10,7 @@ describe TrafficJam do
   describe 'constructor' do
     it "should take default options" do
       config = TrafficJam::Configuration.new(key_prefix: 'hello')
-      config.key_prefix = 'hello'
+      assert_equal 'hello', config.key_prefix
     end
   end
 
