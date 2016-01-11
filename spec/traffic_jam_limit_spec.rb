@@ -12,6 +12,20 @@ describe TrafficJam do
     TrafficJam::Limit.new(:test, "user1", max: 3, period: 60 * 60)
   end
 
+  describe :initialize do
+    it 'should raise an argument error on missing max' do
+      assert_raises(ArgumentError) do
+        TrafficJam::Limit.new(:test, "user1", period: 60 * 60)
+      end
+    end
+
+    it 'should raise an argument error on missing period' do
+      assert_raises(ArgumentError) do
+        TrafficJam::Limit.new(:test, "user1", max: 3)
+      end
+    end
+  end
+
   describe :increment do
     it "should be true when rate limit is not exceeded" do
       assert limit.increment(1)
