@@ -33,8 +33,8 @@ module TrafficJam
     # @param period [Integer] required limit period in seconds
     # @raise [ArgumentError] if max or period is nil
     def initialize(action, value, max: nil, period: nil)
-      raise ArgumentError('Max is required') if max.nil?
-      raise ArgumentError('Period is required') if period.nil?
+      raise ArgumentError.new('Max is required') if max.nil?
+      raise ArgumentError.new('Period is required') if period.nil?
       @action, @value, @max, @period = action, value, max, period
     end
 
