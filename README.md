@@ -45,6 +45,8 @@ TrafficJam configuration object can be accessed with `TrafficJam.config` or in a
 
 **key_prefix** (default: "traffic_jam"): The string prefixing all keys in Redis.
 
+**logger** (optional): A logger used to log all exceeded rate limits.
+
 ### Registering limits
 
 Fixed limits can be registered for a key if the cap does not change depending on the value. All instance methods are available on the class.
