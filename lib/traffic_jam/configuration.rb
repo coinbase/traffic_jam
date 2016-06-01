@@ -3,7 +3,7 @@ module TrafficJam
   #
   # @see TrafficJam#configure
   class Configuration
-    OPTIONS = %i( key_prefix hash_length redis )
+    OPTIONS = %i( key_prefix hash_length redis logger )
 
     # @!attribute redis
     #   @return [Redis] the connected Redis client the library uses
@@ -12,6 +12,8 @@ module TrafficJam
     # @!attribute hash_length
     #   @return [String] the number of characters to use from the Base64 encoded
     #     hashes of the limit values
+    # @!attribute logger
+    #   @return [Logger] the logger object to be used for logging that a limit was exceeded
     attr_accessor *OPTIONS
 
     def initialize(options = {})

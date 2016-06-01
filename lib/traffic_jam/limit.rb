@@ -98,6 +98,15 @@ module TrafficJam
     #   limit
     def increment!(amount = 1, time: Time.now)
       if !increment(amount, time: time)
+        if logger.present?
+          logger.info(
+            message: "Exceeded Limit - Action: #{action}, Value: #{value}, Max: #{max}, Limit: #{limit}",
+            action: action,
+            value: value,
+            max: max,
+            limit: limit
+          )
+        end
         raise TrafficJam::LimitExceededError.new(self)
       end
     end
@@ -158,6 +167,10 @@ module TrafficJam
 
     def redis
       config.redis
+    end
+
+    def logger
+      config.logger
     end
 
     def key
