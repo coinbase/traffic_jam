@@ -127,9 +127,7 @@ module TrafficJam
     def used
       return 0 if max.zero?
 
-      obj = redis.hgetall(key)
-      timestamp = obj['timestamp']
-      amount = obj['amount']
+      timestamp, amount = redis.hmget(key, 'timestamp', 'amount')
       if timestamp && amount
         time_passed = Time.now.to_f - timestamp.to_i / 1000.0
         drift = max * time_passed / period
