@@ -10,5 +10,11 @@ module TrafficJam
 
     INCREMENT_SCRIPT = load('increment')
     INCREMENT_SCRIPT_HASH = Digest::SHA1.hexdigest(INCREMENT_SCRIPT)
+    INCREMENT_ROLLING = load('increment_rolling')
+    INCREMENT_ROLLING_HASH = Digest::SHA1.hexdigest(INCREMENT_ROLLING)
+    INCRBY = load('incrby')
+    INCRBY_HASH = Digest::SHA1.hexdigest(INCRBY)
+    SUM_ROLLING = load('sum_rolling')
+    SUM_ROLLING_HASH = Digest::SHA1.hexdigest(SUM_ROLLING)
   end
 end

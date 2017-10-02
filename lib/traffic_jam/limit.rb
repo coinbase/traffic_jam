@@ -78,7 +78,7 @@ module TrafficJam
         begin
           redis.evalsha(
             Scripts::INCREMENT_SCRIPT_HASH, keys: [key], argv: argv)
-        rescue Redis::CommandError => e
+        rescue Redis::CommandError
           redis.eval(Scripts::INCREMENT_SCRIPT, keys: [key], argv: argv)
         end
 
@@ -159,7 +159,7 @@ module TrafficJam
     end
 
     def key
-      if @key.nil?
+      if !defined?(@key) || @key.nil?
         converted_value =
           begin
             value.to_rate_limit_value
