@@ -27,6 +27,10 @@ describe TrafficJam do
   end
 
   describe :increment do
+    after do
+      Spy.teardown
+    end
+
     it "should be true when rate limit is not exceeded" do
       assert limit.increment(1)
     end
