@@ -71,7 +71,7 @@ module TrafficJam
         raise ArgumentError.new("Amount must be an integer")
       end
 
-      timestamp = (time.to_f * 1000).round
+      timestamp = (time.to_f * 1000).to_i
       argv = [timestamp, amount.to_i, max, period * 1000]
 
       result =
