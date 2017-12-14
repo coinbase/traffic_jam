@@ -174,7 +174,7 @@ module TrafficJam
     end
 
     def key_prefix
-      config.prefix
+      config.key_prefix
     end
   end
 end
