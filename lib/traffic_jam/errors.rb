@@ -10,5 +10,8 @@ module TrafficJam
         @limit = limit
       end
     end
+
+    class InvalidKeyError < StandardError; end
+    class UnknownReturnValue < StandardError; end
   end
 end

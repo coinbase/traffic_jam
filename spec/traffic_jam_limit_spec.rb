@@ -36,6 +36,7 @@ describe TrafficJam do
     end
 
     it "should be false when raise limit is exceeded" do
+      assert !limit.increment(4)
       assert limit.increment(1)
       assert limit.increment(2)
       assert !limit.increment(1)

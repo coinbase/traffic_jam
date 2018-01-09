@@ -4,6 +4,7 @@ require_relative 'traffic_jam/errors'
 require_relative 'traffic_jam/configuration'
 require_relative 'traffic_jam/limit'
 require_relative 'traffic_jam/limit_group'
+require_relative 'traffic_jam/simple_limit'
 require_relative 'traffic_jam/rolling_limit'
 require_relative 'traffic_jam/lifetime_limit'
 

@@ -168,9 +168,13 @@ module TrafficJam
           end
         hash = Digest::MD5.base64digest(converted_value.to_s)
         hash = hash[0...config.hash_length]
-        @key = "#{config.key_prefix}:#{action}:#{hash}"
+        @key = "#{key_prefix}:#{action}:#{hash}"
       end
       @key
+    end
+
+    def key_prefix
+      config.key_prefix
     end
   end
 end
