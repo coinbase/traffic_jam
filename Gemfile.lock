@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    traffic_jam (1.0.2)
+    traffic_jam (1.1.0)
       redis (~> 3.0)
 
 GEM
