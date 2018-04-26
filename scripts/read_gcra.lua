@@ -1,9 +1,7 @@
 local burst = ARGV[1]
-local rate = ARGV[2]
-local period = ARGV[3]
+local period = ARGV[2]
 
-local emission_interval = period / rate
-local burst_offset = emission_interval * burst
+local burst_offset = period * burst
 local now = redis.call("TIME")
 
 -- redis returns time as an array containing two integers: seconds of the epoch
@@ -27,7 +25,7 @@ end
 local allow_at = math.max(tat, now) - burst_offset
 local diff = now - allow_at
 
-local remaining = math.floor(diff / emission_interval + 0.5) -- poor's man round
+local remaining = math.floor(diff / period + 0.5) -- poor's man round
 
 if remaining < 1 then
     return burst

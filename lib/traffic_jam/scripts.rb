@@ -17,7 +17,7 @@ module TrafficJam
     INCREMENT_GCRA = load('increment_gcra')
     INCREMENT_GCRA_HASH = Digest::SHA1.hexdigest(INCREMENT_GCRA)
     READ_GCRA = load('read_gcra')
-    READ_GCRA_HASH = Digest::SHA1.hexdigest(INCREMENT_GCRA)
+    READ_GCRA_HASH = Digest::SHA1.hexdigest(READ_GCRA)
     INCRBY = load('incrby')
     INCRBY_HASH = Digest::SHA1.hexdigest(INCRBY)
     SUM_ROLLING = load('sum_rolling')

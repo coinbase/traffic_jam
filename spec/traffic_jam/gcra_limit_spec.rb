@@ -67,6 +67,12 @@ describe TrafficJam do
       assert_equal 1, limit.used
     end
 
+    it "should replenish the limit as time passes" do
+      limit.increment(4)
+      sleep(period / 2.0)
+      assert_equal 2, limit.used
+    end
+
     it "should reset after the period elapses" do
       limit.increment(2)
       sleep(period)

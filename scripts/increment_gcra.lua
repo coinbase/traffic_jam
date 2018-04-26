@@ -2,13 +2,11 @@
 redis.replicate_commands()
 
 local burst = ARGV[1]
-local rate = ARGV[2]
-local period = ARGV[3]
-local cost = ARGV[4]
+local period = ARGV[2]
+local cost = ARGV[3]
 
-local emission_interval = period / rate
-local increment = emission_interval * cost
-local burst_offset = emission_interval * burst
+local increment = period * cost
+local burst_offset = period * burst
 local now = redis.call("TIME")
 
 -- redis returns time as an array containing two integers: seconds of the epoch
@@ -33,7 +31,7 @@ local new_tat = math.max(tat, now) + increment
 local allow_at = new_tat - burst_offset
 local diff = now - allow_at
 
-local remaining = math.floor(diff / emission_interval + 0.5) -- poor man's round
+local remaining = math.floor(diff / period + 0.5) -- poor man's round
 
 if remaining < 0 then
   return false

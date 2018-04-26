@@ -21,7 +21,7 @@ module TrafficJam
       raise ArgumentError.new("Amount must be positive") if amount < 0
       raise ArgumentError.new("Amount must be an integer") if amount != amount.to_i
       return false if amount > max
-      !!run_increment_script(key, [max, max, period, amount])
+      !!run_increment_script(key, [max, period, amount])
     end
 
     # Decrement the amount used by the given number.
@@ -38,7 +38,7 @@ module TrafficJam
     # @return [Integer] amount used
     def used
       return 0 if max.zero?
-      run_read_script(key, [max, max, period])
+      run_read_script(key, [max, period])
     end
 
     def key_prefix
