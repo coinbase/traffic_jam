@@ -2,10 +2,21 @@ require_relative 'limit'
 require_relative 'scripts'
 
 module TrafficJam
-  # TODO add some nice prose about GRCA
+  # GCRA (Genetic Cell Rate Algorithm) is a leaky bucket type rate limiting
+  # algorithm. GCRA works by tracking remaining limit through a time called
+  # the “theoretical arrival time” (TAT), which is seeded on the first request
+  # by adding a duration representing its cost to the current time. The cost
+  # is calculated as a multiplier of our “emission interval” (T), which is
+  # derived from the rate at which we want the bucket to refill. In this
+  # implementation, the emission interval is derived from the period,
+  # assuming that the user wants the limit to completely replenish over the
+  # period. When any subsequent request comes in, we take the existing TAT,
+  # subtract a fixed buffer representing the limit’s total burst capacity from
+  # it (τ + T), and compare the result to the current time. This result represents
+  # the next time to allow a request. If it’s in the past, we allow the incoming
+  # request, and if it’s in the future, we don’t. After a successful request, a
+  # new TAT is calculated by adding T. (see https://brandur.org/rate-limiting)
   #
-  # Example: Limit is 5 per 10 seconds.
-  #          Explain how this works!
   class GCRALimit < Limit
     # Increment the amount used by the given number. Does not perform increment
     # if the operation would exceed the limit. Returns whether the operation was
