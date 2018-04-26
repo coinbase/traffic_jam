@@ -1,12 +1,13 @@
 -- this script has side-effects, so it requires replicate commands mode
 redis.replicate_commands()
 
-local burst = ARGV[1]
+local rate_limit_key = KEYS[1]
+local max = ARGV[1]
 local period = ARGV[2]
-local cost = ARGV[3]
+local value = ARGV[3]
 
-local increment = period * cost
-local burst_offset = period * burst
+local emission_interval = period / max
+local increment = emission_interval * value
 local now = redis.call("TIME")
 
 -- redis returns time as an array containing two integers: seconds of the epoch
@@ -19,24 +20,25 @@ local now = redis.call("TIME")
 local jan_1_2017 = 1483228800
 now = (now[1] - jan_1_2017) + (now[2] / 1000000)
 
-local tat = redis.call("GET", KEYS[1])
+local tat = redis.call("GET", rate_limit_key)
 
 if not tat then
-  tat = now
+    tat = now
 else
-  tat = tonumber(tat)
+    tat = tonumber(tat)
 end
 
 local new_tat = math.max(tat, now) + increment
-local allow_at = new_tat - burst_offset
+
+local allow_at = new_tat - period
 local diff = now - allow_at
 
-local remaining = math.floor(diff / period + 0.5) -- poor man's round
+local remaining = math.floor(diff / emission_interval + 0.5) -- rounding
 
 if remaining < 0 then
-  return false
+    return false
+else
+    local reset_after = new_tat - now
+    redis.call("SET", rate_limit_key, new_tat, "EX", math.ceil(reset_after))
+    return true
 end
-
-local reset_after = new_tat - now
-redis.call("SET", KEYS[1], new_tat, "EX", math.ceil(reset_after))
-return true
