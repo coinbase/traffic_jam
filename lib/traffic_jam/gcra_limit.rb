@@ -49,7 +49,7 @@ module TrafficJam
     # @return [Integer] amount used
     def used
       return 0 if max.zero?
-      run_read_script(key, [max, period])
+      max - run_read_script(key, [max, period])
     end
 
     def key_prefix

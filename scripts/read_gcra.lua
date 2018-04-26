@@ -29,7 +29,7 @@ local diff = now - allow_at
 local remaining = math.floor(diff / emission_interval + 0.5) -- rounding
 
 if remaining < 1 then
-    return max
+    return 0
 else
-    return max - remaining
+    return remaining
 end
