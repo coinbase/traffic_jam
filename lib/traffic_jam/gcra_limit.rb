@@ -2,7 +2,7 @@ require_relative 'limit'
 require_relative 'scripts'
 
 module TrafficJam
-  # GCRA (Genetic Cell Rate Algorithm) is a leaky bucket type rate limiting
+  # GCRA (Generic Cell Rate Algorithm) is a leaky bucket type rate limiting
   # algorithm. GCRA works by tracking remaining limit through a time called
   # the “theoretical arrival time” (TAT), which is seeded on the first request
   # by adding a duration representing its cost to the current time. The cost
