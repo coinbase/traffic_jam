@@ -13,7 +13,9 @@ describe TrafficJam do
   end
 
   describe :increment do
-    after { Spy.teardown }
+    after do
+      Spy.teardown
+    end
 
     it "should be true when rate limit is not exceeded" do
       assert limit.increment(1)
@@ -67,16 +69,10 @@ describe TrafficJam do
       assert_equal 1, limit.used
     end
 
-    it "should replenish the limit as time passes" do
-      limit.increment(3)
+    it "should decrease over time" do
+      limit.increment(2)
       sleep(period / 2)
       assert_equal 1, limit.used
-    end
-
-    it "should reset after the period elapses" do
-      limit.increment(2)
-      sleep(period)
-      assert_equal 0, limit.used
     end
   end
 end
