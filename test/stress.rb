@@ -11,7 +11,8 @@ options = {
   actions: 1000,
   keys: 5,
   limit: 100,
-  redis_uri: 'redis://127.0.0.1:6379'
+  redis_uri: 'redis://127.0.0.1:6379',
+  strategy: 'Limit'
 }
 
 OptionParser.new do |opts|
@@ -20,6 +21,7 @@ OptionParser.new do |opts|
   opts.on( "-n", "--actions N", "How many increments each process should perform" ) { |i| options[:actions] = i.to_i }
   opts.on( "-k", "--keys KEYS", "How many keys a process should run through" ) { |i| options[:keys] = i.to_i }
   opts.on( "-l", "--limit LIMIT", "Actions per second limit" ) { |i| options[:limit] = i.to_i }
+  opts.on( "-s", "--strategy STRATEGY", "Name of Limit subclass to apply" ) { |klass| options[:strategy] = klass }
   opts.on( "-u", "--redis-uri URI", "Redis URI" ) { |uri| options[:redis_uri] = uri }
   opts.on( "-h", "--help", "Display this usage summary" ) { puts opts; exit }
 end.parse!
@@ -33,9 +35,10 @@ class Runner
 
   def run
     results = Hash[ (0...options[:keys]).map { |i| [ i, [ 0, 0 ] ] } ]
+    limit_class = Object.const_get("TrafficJam::#{options[:strategy]}")
     options[:actions].times do
       i = results.keys.sample
-      if TrafficJam.increment(:test, "val#{i}")
+      if limit_class.new(:test, "val#{i}", max: options[:limit], period: 1).increment
         results[i][0] += 1
       else
         results[i][1] += 1
@@ -51,8 +54,7 @@ class Runner
       rd.close
 
       TrafficJam.configure do |config|
-        config.redis = Redis.connect(url: options[:redis_uri])
-        config.register :test, options[:limit], 1
+        config.redis = Redis.new(url: options[:redis_uri])
       end
 
       results = run
@@ -69,10 +71,10 @@ end
 
 puts "[#{Process.pid}] Starting with #{options.inspect}"
 
-redis = Redis.connect(url: options[:redis_uri])
+redis = Redis.new(url: options[:redis_uri])
 redis.flushall          # clean before run
 redis.script(:flush)    # clean scripts before run
-redis.client.disconnect # don't keep when forking
+redis.disconnect! # don't keep when forking
 
 start = Time.now
 pipes = options[:forks].times.map do

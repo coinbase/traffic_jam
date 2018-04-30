@@ -2,21 +2,28 @@ require_relative 'limit'
 require_relative 'scripts'
 
 module TrafficJam
-  # A SimpleLimit is a limit type that is more efficient for increments but does
-  # not support decrements or changing the max value without a complete reset.
-  # This means that if the period or max value for an action, value key changes,
-  # the used and remaining values cannot be preserved.
-  #
-  # This works by storing a key in Redis with a millisecond-precision expiry
+  # GCRA (Generic Cell Rate Algorithm) is a leaky bucket type rate limiting
+  # algorithm. GCRA works by storing a key in Redis with a ms-precision expiry
   # representing the time that the limit will be completely reset. Each
   # increment operation converts the increment amount into the number of
   # milliseconds to be added to the expiry.
+  #
+  # When a request comes in, we take the existing expiry value, subtract a fixed
+  # amount representing the limit’s total burst capacity from it, and compare
+  # the result to the current time. This result represents the next time to
+  # allow a request. If it’s in the past, we allow the incoming request, and if
+  # it’s in the future, we don’t. After a successful request, a new expiry is
+  # calculated. (see https://brandur.org/rate-limiting)
+  #
+  # This limit type does not support decrements or changing the max value without
+  # a complete reset. This means that if the period or max value for an
+  # action/value key changes, the used and remaining values cannot be preserved.
   #
   # Example: Limit is 5 per 10 seconds.
   #     An increment by 1 first sets the key to expire in 2s.
   #     Another immediate increment by 4 sets the expiry to 10s.
   #     Subsequent increments fail until clock time catches up to expiry
-  class SimpleLimit < Limit
+  class GCRALimit < Limit
     # Increment the amount used by the given number. Does not perform increment
     # if the operation would exceed the limit. Returns whether the operation was
     # successful.
@@ -42,9 +49,9 @@ module TrafficJam
       result =
         begin
           redis.evalsha(
-            Scripts::INCREMENT_SIMPLE_HASH, keys: [key], argv: argv)
+            Scripts::INCREMENT_GCRA_HASH, keys: [key], argv: argv)
         rescue Redis::CommandError
-          redis.eval(Scripts::INCREMENT_SIMPLE, keys: [key], argv: argv)
+          redis.eval(Scripts::INCREMENT_GCRA, keys: [key], argv: argv)
         end
 
       case result
@@ -57,7 +64,7 @@ module TrafficJam
       else
         raise Errors::UnknownReturnValue,
               "Received unexpected return value #{result} from " \
-              "increment_simple eval"
+              "increment_gcra eval"
       end
     end
 
@@ -91,4 +98,7 @@ module TrafficJam
       "#{config.key_prefix}:s"
     end
   end
+
+  # alias for backward compatibility
+  SimpleLimit = GCRALimit
 end

@@ -9,7 +9,7 @@ describe TrafficJam do
 
   let(:period) { 0.1 }
   let(:limit) do
-    TrafficJam::SimpleLimit.new(:test, "user1", max: 3, period: period)
+    TrafficJam::GCRALimit.new(:test, "user1", max: 3, period: period)
   end
 
   describe :increment do
@@ -50,7 +50,7 @@ describe TrafficJam do
 
     describe "when max is zero" do
       let(:limit) do
-        TrafficJam::SimpleLimit.new(:test, "user1", max: 0, period: period)
+        TrafficJam::GCRALimit.new(:test, "user1", max: 0, period: period)
       end
 
       it "should be false for any positive amount" do
